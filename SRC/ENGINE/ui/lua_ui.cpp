@@ -1,0 +1,40 @@
+#include "lua_ui.h"
+namespace q3d { namespace ui { namespace lua { namespace api {
+int l_panel_new(lua_State*) { return 0; }
+int l_panel_add(lua_State*) { return 0; }
+int l_panel_remove(lua_State*) { return 0; }
+int l_panel_clear(lua_State*) { return 0; }
+int l_panel_set_title(lua_State*) { return 0; }
+int l_panel_set_pos(lua_State*) { return 0; }
+int l_panel_set_size(lua_State*) { return 0; }
+int l_panel_show(lua_State*) { return 0; }
+int l_panel_hide(lua_State*) { return 0; }
+int l_panel_dock(lua_State*) { return 0; }
+int l_button(lua_State*) { return 0; }
+int l_label(lua_State*) { return 0; }
+int l_image(lua_State*) { return 0; }
+int l_slider(lua_State*) { return 0; }
+int l_list(lua_State*) { return 0; }
+int l_tree(lua_State*) { return 0; }
+int l_text_input(lua_State*) { return 0; }
+int l_color_picker(lua_State*) { return 0; }
+int l_file_picker(lua_State*) { return 0; }
+int l_dropdown(lua_State*) { return 0; }
+int l_tabs(lua_State*) { return 0; }
+int l_widget_set_pos(lua_State*) { return 0; }
+int l_widget_set_size(lua_State*) { return 0; }
+int l_widget_set_enabled(lua_State*) { return 0; }
+int l_widget_set_visible(lua_State*) { return 0; }
+int l_widget_set_style(lua_State*) { return 0; }
+int l_widget_on_click(lua_State*) { return 0; }
+int l_widget_on_change(lua_State*) { return 0; }
+int l_widget_on_hover(lua_State*) { return 0; }
+int l_layout_hbox(lua_State*) { return 0; }
+int l_layout_vbox(lua_State*) { return 0; }
+int l_layout_grid(lua_State*) { return 0; }
+int l_layout_dock(lua_State*) { return 0; }
+int l_theme_load(lua_State*) { return 0; }
+int l_theme_set_color(lua_State*) { return 0; }
+int l_theme_set_font(lua_State*) { return 0; }
+const luaL_Reg ui_functions[] = {{nullptr, nullptr}};
+}}}}
