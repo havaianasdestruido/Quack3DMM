@@ -6,7 +6,7 @@ namespace fs = std::filesystem;
 
 namespace q3m {
 
-std::unique_ptr<Package> Package::open(q3d::vfs::StrPtr path) {
+std::unique_ptr<Package> Package::create(q3d::vfs::StrPtr path) {
     if (!path)
         return nullptr;
     fs::path p(path);

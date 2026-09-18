@@ -9,7 +9,7 @@ namespace q3m {
 
 class Package {
 public:
-    static std::unique_ptr<Package> open(q3d::vfs::StrPtr path);
+    static std::unique_ptr<Package> create(q3d::vfs::StrPtr path);
 
     bool contains(const char* vpath_in_package) const;
     std::unique_ptr<q3d::vfs::IStream> open(const char* vpath_in_package);

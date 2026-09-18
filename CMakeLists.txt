@@ -54,19 +54,27 @@ endif()
 
 add_compile_definitions(UNICODE _UNICODE)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/INC
-    ${CMAKE_SOURCE_DIR}/BREN/INC
-    ${CMAKE_SOURCE_DIR}/KAUAI/SRC
-)
-
 include(CTest)
 
-add_subdirectory(BREN)
-add_subdirectory(KAUAI)
+option(BUILD_LEGACY_ENGINE "Build the legacy 3D Movie Maker engine libraries" OFF)
+
+# Lua (always needed by script/sandbox/q3d_ui)
 add_subdirectory(third_party/luasrc)
+
+# Modern modding layer (vfs / q3m / mod_manager) - always built
 add_subdirectory(SRC/ENGINE)
-add_subdirectory(SRC/STUDIO)
+
+# Legacy SOC engine (pre-C++98 code, still being modernized). Off by default
+if(BUILD_LEGACY_ENGINE)
+    include_directories(
+        ${CMAKE_SOURCE_DIR}/INC
+        ${CMAKE_SOURCE_DIR}/BREN/INC
+        ${CMAKE_SOURCE_DIR}/KAUAI/SRC
+    )
+    add_subdirectory(BREN)
+    add_subdirectory(KAUAI)
+    add_subdirectory(SRC/STUDIO)
+endif()
 
 # --- Modding subsystem tests (standalone, no legacy engine deps) ---
 add_executable(test_vfs TESTS/test_vfs.cpp)
@@ -105,7 +113,7 @@ add_test(NAME test_texture_baker COMMAND test_texture_baker)
 add_executable(test_actor TESTS/test_actor_def.cpp)
 target_link_libraries(test_actor PRIVATE actor)
 add_test(NAME test_actor COMMAND test_actor)
-set_tests_properties(test_actor PROPERTIES WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+set_tests_properties(test_actor PROPERTIES WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 add_executable(test_script TESTS/test_lua.cpp)
 target_link_libraries(test_script PRIVATE script lua mod_core)
