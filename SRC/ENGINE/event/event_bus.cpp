@@ -11,10 +11,9 @@ EventBus &EventBus::instance() {
     return bus;
 }
 
-void EventBus::subscribe_internal(EventID id, std::unique_ptr<Handler> h, const std::string &mod_id) {
+void EventBus::subscribe_internal(EventID id, std::unique_ptr<Handler> h, const std::string &mod_id, int priority) {
     std::lock_guard<std::mutex> lock(mutex_);
     auto *raw = h.get();
-    int priority = 0;
     auto &vec = handlers_[id];
     vec.emplace_back(priority, std::move(h));
     handler_owners_[raw] = { id, mod_id };
@@ -27,15 +26,19 @@ void EventBus::fire_internal(EventID id, AnyEvent *event) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (disabled_.count(id)) return;
 
-    auto now = std::chrono::steady_clock::now().time_since_epoch();
-    long ms = static_cast<long>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
     auto itThrottle = throttle_.find(id);
     if (itThrottle != throttle_.end()) {
-        auto last = last_fire_[id];
+        auto now = std::chrono::steady_clock::now().time_since_epoch();
+        long ms = static_cast<long>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+
+        long last = 0;
+        auto itLast = last_fire_.find(id);
+        if (itLast != last_fire_.end()) {
+            last = itLast->second;
+        }
+
         long diff = ms - last;
         if (diff < 1000 / std::max(1, itThrottle->second)) return;
-        last_fire_[id] = ms;
-    } else {
         last_fire_[id] = ms;
     }
 
@@ -72,7 +75,7 @@ EventBus::Subscription EventBus::on_pattern(const char *mod_id, const char *patt
 
     auto h = std::make_unique<PatternHandler>(pattern, std::move(cb), priority);
     auto *raw = h.get();
-    subscribe_internal(pattern, std::move(h), mod_id ? mod_id : "");
+    subscribe_internal(pattern, std::move(h), mod_id ? mod_id : "", priority);
     return { pattern, priority, raw };
 }
 
