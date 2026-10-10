@@ -66,7 +66,7 @@ public:
     Subscription on(const char *mod_id, typename TypedHandler<T>::Callback cb, int priority = 0) {
         auto h = std::make_unique<TypedHandler<T>>(std::move(cb), priority);
         auto *raw = h.get();
-        subscribe_internal(T::StaticID(), std::move(h), mod_id ? mod_id : "");
+        subscribe_internal(T::StaticID(), std::move(h), mod_id ? mod_id : "", priority);
         return { T::StaticID(), priority, raw };
     }
 
@@ -115,7 +115,7 @@ public:
     void set_throttle(EventID id, int max_per_second);
 
 private:
-    void subscribe_internal(EventID id, std::unique_ptr<Handler> h, const std::string &mod_id);
+    void subscribe_internal(EventID id, std::unique_ptr<Handler> h, const std::string &mod_id, int priority);
     Cancelled fire_cancellable_internal(EventID id, AnyEvent *event);
 
     void fire_internal(EventID id, AnyEvent *event);
