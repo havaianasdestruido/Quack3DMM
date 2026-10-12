@@ -1,3 +1,4 @@
+#include <cstring>
 #include "lua_sandbox.h"
 
 #include <new>

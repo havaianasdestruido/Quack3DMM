@@ -26,6 +26,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #endif
 
 #include <chrono>
@@ -33,8 +34,10 @@
 #include <map>
 #include <thread>
 #include <algorithm>
+#if defined(_WIN32)
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
+#endif
 
 namespace q3d {
 namespace hotreload {
