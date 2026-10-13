@@ -17,9 +17,9 @@ void EventBus::subscribe_internal(EventID id, std::unique_ptr<Handler> h, const 
     auto &vec = handlers_[id];
     vec.emplace_back(priority, std::move(h));
     handler_owners_[raw] = { id, mod_id };
-    std::sort(vec.begin(), vec.end(), [](const HandlerEntry &a, const HandlerEntry &b) {
-        return a.first > b.first;
-    });
+    for (int i = vec.size() - 1; i > 0 && vec[i].first > vec[i-1].first; --i) {
+        std::swap(vec[i], vec[i-1]);
+    }
 }
 
 void EventBus::fire_internal(EventID id, AnyEvent *event) {
@@ -99,9 +99,10 @@ void EventBus::unsubscribe(const Subscription &sub) {
         return;
     }
     auto &vec = it->second;
-    vec.erase(std::remove_if(vec.begin(), vec.end(), [&](const HandlerEntry &e) {
-        return e.second.get() == sub.callback_ptr;
-    }), vec.end());
+    auto erase_it = std::find_if(vec.begin(), vec.end(), [&](const HandlerEntry &e) { return e.second.get() == sub.callback_ptr; });
+    if (erase_it != vec.end()) {
+        vec.erase(erase_it);
+    }
     handler_owners_.erase(itOwner);
 }
 
@@ -114,9 +115,10 @@ void EventBus::unsubscribe_mod(const char *mod_id) {
             auto hit = handlers_.find(it->second.first);
             if (hit != handlers_.end()) {
                 auto &vec = hit->second;
-                vec.erase(std::remove_if(vec.begin(), vec.end(), [&](const HandlerEntry &e) {
-                    return e.second.get() == it->first;
-                }), vec.end());
+                auto erase_it = std::find_if(vec.begin(), vec.end(), [&](const HandlerEntry &e) { return e.second.get() == it->first; });
+                if (erase_it != vec.end()) {
+                    vec.erase(erase_it);
+                }
             }
             it = handler_owners_.erase(it);
         } else {

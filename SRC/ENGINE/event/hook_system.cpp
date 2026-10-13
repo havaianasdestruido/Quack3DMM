@@ -26,18 +26,18 @@ void HookSystem::register_before_hook(const char *mod_id, const char *name, Hook
     (void)mod_id;
     auto &vec = before_hooks_[name];
     vec.emplace_back(priority, std::move(cb));
-    std::sort(vec.begin(), vec.end(), [](const HookEntry &a, const HookEntry &b) {
-        return a.first > b.first;
-    });
+    for (int i = vec.size() - 1; i > 0 && vec[i].first > vec[i-1].first; --i) {
+        std::swap(vec[i], vec[i-1]);
+    }
 }
 
 void HookSystem::register_after_hook(const char *mod_id, const char *name, HookCallback cb, int priority) {
     (void)mod_id;
     auto &vec = after_hooks_[name];
     vec.emplace_back(priority, std::move(cb));
-    std::sort(vec.begin(), vec.end(), [](const HookEntry &a, const HookEntry &b) {
-        return a.first > b.first;
-    });
+    for (int i = vec.size() - 1; i > 0 && vec[i].first > vec[i-1].first; --i) {
+        std::swap(vec[i], vec[i-1]);
+    }
 }
 
 void HookSystem::register_replace_hook(const char *mod_id, const char *name, HookCallback cb) {
