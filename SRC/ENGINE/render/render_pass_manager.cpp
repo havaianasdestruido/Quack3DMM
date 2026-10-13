@@ -12,9 +12,9 @@ RenderPassManager& RenderPassManager::instance() { static RenderPassManager m; r
 void RenderPassManager::register_pass(std::shared_ptr<RenderPass> pass) {
     if (!pass) return;
     passes_.push_back(pass);
-    std::sort(passes_.begin(), passes_.end(), [](const std::shared_ptr<RenderPass>& a, const std::shared_ptr<RenderPass>& b) {
-        return a->order() < b->order();
-    });
+    for (int i = passes_.size() - 1; i > 0 && passes_[i]->order() < passes_[i-1]->order(); --i) {
+        std::swap(passes_[i], passes_[i-1]);
+    }
 }
 
 void RenderPassManager::unregister_pass(const char* pass_id) {

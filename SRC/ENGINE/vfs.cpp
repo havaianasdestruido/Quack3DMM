@@ -40,9 +40,9 @@ void VFS::mount_layer(StrPtr path, int priority, bool is_archive) {
         return;
     Layer layer{std::string(path), priority, is_archive};
     _layers.push_back(layer);
-    std::sort(_layers.begin(), _layers.end(), [](const Layer& a, const Layer& b) {
-        return a.priority > b.priority;
-    });
+    for (int i = _layers.size() - 1; i > 0 && _layers[i].priority > _layers[i-1].priority; --i) {
+        std::swap(_layers[i], _layers[i-1]);
+    }
 }
 
 std::shared_ptr<AssetEntry> VFS::resolve(const char* vpath) {
