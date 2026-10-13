@@ -76,14 +76,16 @@ public:
 
     template<typename T>
     void fire(const T &payload) {
-        auto e = std::make_unique<Event<T>>(payload);
-        fire_internal(T::StaticID(), e.get());
+        // Performance optimization: Stack allocation avoids costly heap allocation/deallocation per event.
+        Event<T> e(payload);
+        fire_internal(T::StaticID(), &e);
     }
 
     template<typename T>
     Cancelled fire_cancellable(const T &payload) {
-        auto e = std::make_unique<Event<T>>(payload);
-        return fire_cancellable_internal(T::StaticID(), e.get());
+        // Performance optimization: Stack allocation avoids costly heap allocation/deallocation per event.
+        Event<T> e(payload);
+        return fire_cancellable_internal(T::StaticID(), &e);
     }
 
     void fire_raw(EventID id, const AnyEvent *event);
