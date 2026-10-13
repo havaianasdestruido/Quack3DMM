@@ -41,9 +41,10 @@ void RenderPassManager::insert_pass(std::shared_ptr<RenderPass> pass, const char
 }
 
 void RenderPassManager::remove_pass(const char* pass_id) {
-    passes_.erase(std::remove_if(passes_.begin(), passes_.end(), [pass_id](const std::shared_ptr<RenderPass>& p) {
+    auto it = std::find_if(passes_.begin(), passes_.end(), [pass_id](const std::shared_ptr<RenderPass>& p) {
         return p->id() == pass_id;
-    }), passes_.end());
+    });
+    if (it != passes_.end()) passes_.erase(it);
 }
 
 void RenderPassManager::add_postfx(std::shared_ptr<RenderPass> pass) {

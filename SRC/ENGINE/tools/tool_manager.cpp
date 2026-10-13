@@ -27,8 +27,9 @@ void ToolManager::unregister_tool(const char* tool_id)
 {
     if (!tool_id)
         return;
-    string id(tool_id);
-    tools_.erase(std::remove_if(tools_.begin(), tools_.end(), [&](const shared_ptr<ITool>& t) { return t->id() == id; }), tools_.end());
+    auto it = std::find_if(tools_.begin(), tools_.end(), [&](const shared_ptr<ITool>& t) { return t->id() == tool_id; });
+    if (it != tools_.end())
+        tools_.erase(it);
 }
 
 void ToolManager::unregister_all_for_mod(const char*)
@@ -39,10 +40,9 @@ shared_ptr<ITool> ToolManager::get_tool(const char* id) const
 {
     if (!id)
         return nullptr;
-    string sid(id);
     for (auto& t : tools_)
     {
-        if (t->id() == sid)
+        if (t->id() == id)
             return t;
     }
     return nullptr;
