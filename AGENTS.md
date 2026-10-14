@@ -9,10 +9,11 @@
 Microsoft 3D Movie Maker (1995) open-sourced under MIT. Being modernized into a Garry's Mod-style platform for creating animated videos via mods. The codebase contains the original ~160K LOC pre-C++98 C engine (BRender renderer, Kauai UI/scripting framework, Studio app) plus a modern C++17 modding layer of 14 standalone libraries.
 
 **Key documents** (read when deep context is needed):
+- `SOFTMODDING_TODO.md` — phased checklist of what is still needed for full softmodding support (cited from README)
 - `OVERVIEW.md` — architecture, 7-layer diagram, file format table
 - `ROADMAP.md` — 10-phase modernization plan
 - `SOFTMODDABLE.md` — 20-pillar modding blueprint (GMod-style)
-- `README.md` — original Microsoft open-source README
+- `README.md` — original Microsoft open-source README + softmodding roadmap links
 
 ---
 
@@ -48,6 +49,7 @@ Microsoft 3D Movie Maker (1995) open-sourced under MIT. Being modernized into a 
 ├── TOOLS/                      ← Root-level content tools (TDFMAKE, etc.)
 ├── OBJ/, SRC/SHARED/           ← Legacy build artifacts, shared code
 ├── SOFTMODDABLE.md             ← 20-pillar modding blueprint
+├── SOFTMODDING_TODO.md         ← Phased checklist: what's missing for full softmodding support
 ├── ROADMAP.md                  ← 10-phase modernization roadmap
 ├── OVERVIEW.md                 ← Architecture reference
 └── .gitignore                  ← Standard VS + build/
@@ -102,7 +104,7 @@ cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DBUILD_LEGACY_ENGINE=ON
 | `mod_core` | vfs | Mod manifest parsing (TOML), ModEntry |
 | `script` | vfs, lua | Lua VM management, q3d Lua API |
 | `q3d_ui` | vfs, lua | Theme, widgets, panels, Lua UI bindings |
-| `event` | vfs | Typed pub/sub event bus (34 built-in events) |
+| `event` | vfs | Typed pub/sub event bus (39 built-in events) |
 | `sandbox` | vfs, lua, mod_core | Permission system, trust tiers, Lua sandbox |
 | `hotreload` | vfs | File watching, hot-reload orchestration |
 | `tools` | vfs | Tool framework, 10 built-in tools, hotkeys |
