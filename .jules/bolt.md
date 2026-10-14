@@ -11,3 +11,6 @@
 ## 2024-10-24 - Unnecessary heap allocations on hot paths (String comparisons)
 **Learning:** `ToolManager::unregister_tool` and `ToolManager::get_tool` were constructing temporary `std::string` objects from `const char*` purely for comparison against `ITool::id()`. This caused unnecessary heap allocations (unless SSO kicks in, but it's still overhead) when searching for tools. `std::string` provides an overloaded `operator==` for comparing against `const char*`.
 **Action:** Avoid constructing temporary `std::string` instances for simple string comparison operations.
+## 2024-10-25 - Unnecessary heap allocations when comparing IDs
+**Learning:** `ITool::id()` returned a `std::string` by value, causing heap allocations every time it was called (like in loops when searching for tools).
+**Action:** Use `std::string_view` for string return types and comparisons where ownership is not needed to prevent temporary string allocations.

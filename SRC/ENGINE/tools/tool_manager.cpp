@@ -1,6 +1,7 @@
 #include "tools/tool_manager.h"
 
 #include <algorithm>
+#include <string_view>
 
 namespace q3d {
 namespace tools {
