@@ -5,6 +5,20 @@ under the [MIT license](LICENSE) as open source.
 
 ![3D Movie Maker](https://github.com/microsoft/Microsoft-3D-Movie-Maker/blob/main/IMG/3dmovie.jpg?raw=true)
 
+## Quack3DMM — softmodding roadmap (fork addition)
+
+This fork is being turned into a Garry's Mod-style platform for animated video: every model, texture,
+sound, script, UI panel, tool and shader is hot-swappable user content. The ordered plan for what is
+still needed for **full softmodding support** — with exit criteria per phase — lives in:
+
+| Document | What it covers |
+|---|---|
+| **[SOFTMODDING_TODO.md](SOFTMODDING_TODO.md)** | **The phased checklist of everything still needed for full softmodding support (start here).** |
+| [SOFTMODDABLE.md](SOFTMODDABLE.md) | The 20-pillar softmodding blueprint — what "done" looks like. |
+| [ROADMAP.md](ROADMAP.md) | Modernization plan for the 1995 engine (build, C++17, cross-platform). |
+| [OVERVIEW.md](OVERVIEW.md) | Architecture reference: layers, libraries, file formats. |
+| [AGENTS.md](AGENTS.md) | Conventions and validation checklist for contributors and AI agents. |
+
 ## Building instructions
 
 This project is unlikely to build successfully under modern hardware/software, but you can get started with compilation and get partial completed binaries. Here's what will get you going. Thanks to Mac Sample for their work on getting this far!
