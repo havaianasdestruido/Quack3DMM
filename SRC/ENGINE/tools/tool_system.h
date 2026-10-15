@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <string_view>
 
 namespace q3d {
 namespace tools {
@@ -79,7 +80,7 @@ class ITool {
 public:
     virtual ~ITool() = default;
 
-    virtual string id() const = 0;
+    virtual std::string_view id() const = 0;
     virtual string label() const = 0;
     virtual string description() const = 0;
     virtual string category() const = 0;
