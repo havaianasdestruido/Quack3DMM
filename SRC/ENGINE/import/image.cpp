@@ -1,6 +1,8 @@
 #include "image.h"
 #include <algorithm>
 #include <cmath>
+#include <unordered_map>
+#include <cstdint>
 
 namespace q3d {
 namespace import {
@@ -192,6 +194,8 @@ vector<Image> Image::generate_mipmaps() const
     return mips;
 }
 
+// ⚡ Bolt: Use a hash map for O(1) color lookups instead of an O(N) array search.
+// This reduces time complexity from O(W*H*C) to O(W*H).
 void Image::to_indexed(vector<byte>& indices, vector<Color>& palette, int max_colors)
 {
     indices.clear();
@@ -201,20 +205,29 @@ void Image::to_indexed(vector<byte>& indices, vector<Color>& palette, int max_co
     const int stride = 4;
     size_t pixelCount = static_cast<size_t>(width * height);
     indices.resize(pixelCount);
+
+    std::unordered_map<uint32_t, size_t> color_map;
+
     for (size_t i = 0; i < pixelCount; ++i) {
         const byte* p = &pixels[i * stride];
         Color c{ p[0], p[1], p[2], p[3] };
-        size_t idx = 0;
-        for (; idx < palette.size(); ++idx) {
-            const Color& pc = palette[idx];
-            if (pc.r == c.r && pc.g == c.g && pc.b == c.b && pc.a == c.a)
-                break;
-        }
-        if (idx == palette.size()) {
-            if (palette.size() < static_cast<size_t>(max_colors))
+        uint32_t key = (static_cast<uint32_t>(c.r) << 24) |
+                       (static_cast<uint32_t>(c.g) << 16) |
+                       (static_cast<uint32_t>(c.b) << 8) |
+                       static_cast<uint32_t>(c.a);
+
+        size_t idx;
+        auto it = color_map.find(key);
+        if (it != color_map.end()) {
+            idx = it->second;
+        } else {
+            idx = palette.size();
+            if (palette.size() < static_cast<size_t>(max_colors)) {
                 palette.push_back(c);
-            else
+                color_map[key] = idx;
+            } else {
                 idx = 0;
+            }
         }
         indices[i] = static_cast<byte>(idx);
     }
