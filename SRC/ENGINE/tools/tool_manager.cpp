@@ -28,7 +28,8 @@ void ToolManager::unregister_tool(const char* tool_id)
 {
     if (!tool_id)
         return;
-    auto it = std::find_if(tools_.begin(), tools_.end(), [&](const shared_ptr<ITool>& t) { return t->id() == tool_id; });
+    std::string_view tool_id_view(tool_id);
+    auto it = std::find_if(tools_.begin(), tools_.end(), [&](const shared_ptr<ITool>& t) { return t->id() == tool_id_view; });
     if (it != tools_.end())
         tools_.erase(it);
 }
@@ -41,9 +42,10 @@ shared_ptr<ITool> ToolManager::get_tool(const char* id) const
 {
     if (!id)
         return nullptr;
+    std::string_view view_id(id);
     for (auto& t : tools_)
     {
-        if (t->id() == id)
+        if (t->id() == view_id)
             return t;
     }
     return nullptr;
@@ -99,7 +101,6 @@ void ToolManager::register_hotkey(const char* tool_id, int vk, int)
 {
     if (!tool_id)
         return;
-    string id(tool_id);
     auto it = reverse_hotkey_.find(vk);
     if (it != reverse_hotkey_.end())
     {
@@ -107,16 +108,16 @@ void ToolManager::register_hotkey(const char* tool_id, int vk, int)
             hotkey_conflict_handler_(tool_id, vk, it->second.c_str());
         return;
     }
+    string id(tool_id);
     hotkey_map_[id] = vk;
-    reverse_hotkey_[vk] = id;
+    reverse_hotkey_[vk] = std::move(id);
 }
 
 void ToolManager::unregister_hotkey(const char* tool_id)
 {
     if (!tool_id)
         return;
-    string id(tool_id);
-    auto it = hotkey_map_.find(id);
+    auto it = hotkey_map_.find(std::string_view(tool_id));
     if (it == hotkey_map_.end())
         return;
     int vk = it->second;
@@ -211,7 +212,7 @@ string ToolManager::get_tooltip(const char* tool_id) const
 {
     if (!tool_id)
         return string();
-    auto it = tooltips_.find(string(tool_id));
+    auto it = tooltips_.find(std::string_view(tool_id));
     if (it != tooltips_.end())
         return it->second;
     return string();
@@ -220,7 +221,13 @@ string ToolManager::get_tooltip(const char* tool_id) const
 void ToolManager::set_tooltip(const char* tool_id, const string& tip)
 {
     if (tool_id)
-        tooltips_[string(tool_id)] = tip;
+    {
+        auto it = tooltips_.find(std::string_view(tool_id));
+        if (it != tooltips_.end())
+            it->second = tip;
+        else
+            tooltips_.emplace(string(tool_id), tip);
+    }
 }
 
 void ToolManager::on_frame(float dt)

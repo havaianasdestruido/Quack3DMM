@@ -79,11 +79,11 @@ private:
 
     vector<shared_ptr<ITool>> tools_;
     shared_ptr<ITool> current_tool_;
-    map<string, int> hotkey_map_;
+    map<string, int, std::less<>> hotkey_map_;
     map<int, string> reverse_hotkey_;
     function<void(const char*, int, const char*)> hotkey_conflict_handler_;
     unordered_map<string, ContextMenuBuilder> context_menus_;
-    map<string, string> tooltips_;
+    map<string, string, std::less<>> tooltips_;
     vector<string> palette_;
 };
 
