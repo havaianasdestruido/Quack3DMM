@@ -14,3 +14,6 @@
 ## 2024-10-25 - Unnecessary heap allocations when comparing IDs
 **Learning:** `ITool::id()` returned a `std::string` by value, causing heap allocations every time it was called (like in loops when searching for tools).
 **Action:** Use `std::string_view` for string return types and comparisons where ownership is not needed to prevent temporary string allocations.
+## 2024-10-31 - Hoist strlen from loops
+**Learning:** Comparing `std::string_view` against a `const char*` inside a loop will call `strlen` on the `const char*` every iteration.
+**Action:** Convert `const char*` to `std::string_view` before the loop.
