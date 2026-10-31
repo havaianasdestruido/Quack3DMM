@@ -24,10 +24,16 @@ void ToolManager::register_tool(shared_ptr<ITool> tool)
     tools_.push_back(tool);
 }
 
-void ToolManager::unregister_tool(const char* tool_id)
+void ToolManager::unregister_tool(const char* tool_id_cstr)
 {
-    if (!tool_id)
+    if (!tool_id_cstr)
         return;
+
+    // PERFORMANCE OPTIMIZATION:
+    // We hoist strlen() out of the loop by wrapping the const char* in a string_view once.
+    // ITool::id() returns a string_view, so this changes the loop body from an O(N) c-string scan
+    // per tool to an O(1) length check followed by a memcmp.
+    std::string_view tool_id(tool_id_cstr);
     auto it = std::find_if(tools_.begin(), tools_.end(), [&](const shared_ptr<ITool>& t) { return t->id() == tool_id; });
     if (it != tools_.end())
         tools_.erase(it);
@@ -37,10 +43,16 @@ void ToolManager::unregister_all_for_mod(const char*)
 {
 }
 
-shared_ptr<ITool> ToolManager::get_tool(const char* id) const
+shared_ptr<ITool> ToolManager::get_tool(const char* id_cstr) const
 {
-    if (!id)
+    if (!id_cstr)
         return nullptr;
+
+    // PERFORMANCE OPTIMIZATION:
+    // We hoist strlen() out of the loop by wrapping the const char* in a string_view once.
+    // ITool::id() returns a string_view, so this changes the loop body from an O(N) c-string scan
+    // per tool to an O(1) length check followed by a memcmp.
+    std::string_view id(id_cstr);
     for (auto& t : tools_)
     {
         if (t->id() == id)
