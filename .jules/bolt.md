@@ -17,3 +17,6 @@
 ## 2024-10-31 - Hoist strlen from loops
 **Learning:** Comparing `std::string_view` against a `const char*` inside a loop will call `strlen` on the `const char*` every iteration.
 **Action:** Convert `const char*` to `std::string_view` before the loop.
+## 2024-10-31 - Zero-allocation map lookup with string_view
+**Learning:** `std::map` and `std::unordered_map` with `std::string` keys require constructing a `std::string` when calling `.find()` or `.erase()` with a `const char*` or `std::string_view` parameter unless a transparent comparator (`std::less<>`) is provided. This causes unnecessary heap allocations.
+**Action:** When using associative containers with string keys in C++14/17, explicitly define the comparator as `std::less<>` (e.g., `std::map<std::string, T, std::less<>>`) to enable zero-allocation lookups with `std::string_view` or `const char*`.
