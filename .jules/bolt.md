@@ -17,3 +17,6 @@
 ## 2024-10-31 - Hoist strlen from loops
 **Learning:** Comparing `std::string_view` against a `const char*` inside a loop will call `strlen` on the `const char*` every iteration.
 **Action:** Convert `const char*` to `std::string_view` before the loop.
+## 2024-11-04 - Avoid string allocations in ToolManager lookups
+**Learning:** `std::map` (and `std::unordered_map` in C++20 with custom hasher) can use `std::less<>` (or `std::equal_to<>`) for transparent comparators, avoiding the need to construct temporary `std::string` objects when querying the map with `std::string_view` or `const char*`.
+**Action:** Use transparent comparators in map declarations (e.g., `std::map<std::string, T, std::less<>>`) to enable zero-allocation lookups with `std::string_view` or string literals on hot paths.

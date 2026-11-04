@@ -127,8 +127,7 @@ void ToolManager::unregister_hotkey(const char* tool_id)
 {
     if (!tool_id)
         return;
-    string id(tool_id);
-    auto it = hotkey_map_.find(id);
+    auto it = hotkey_map_.find(std::string_view(tool_id));
     if (it == hotkey_map_.end())
         return;
     int vk = it->second;
@@ -193,7 +192,7 @@ void ToolManager::show_context_menu(const char* menu_id, ToolContext* ctx, int x
 {
     if (!menu_id)
         return;
-    auto it = context_menus_.find(menu_id);
+    auto it = context_menus_.find(std::string_view(menu_id));
     if (it == context_menus_.end())
         return;
     if (it->second)
@@ -223,7 +222,7 @@ string ToolManager::get_tooltip(const char* tool_id) const
 {
     if (!tool_id)
         return string();
-    auto it = tooltips_.find(string(tool_id));
+    auto it = tooltips_.find(std::string_view(tool_id));
     if (it != tooltips_.end())
         return it->second;
     return string();
