@@ -127,7 +127,7 @@ void ToolManager::unregister_hotkey(const char* tool_id)
 {
     if (!tool_id)
         return;
-    string id(tool_id);
+    std::string_view id(tool_id);
     auto it = hotkey_map_.find(id);
     if (it == hotkey_map_.end())
         return;
@@ -223,7 +223,8 @@ string ToolManager::get_tooltip(const char* tool_id) const
 {
     if (!tool_id)
         return string();
-    auto it = tooltips_.find(string(tool_id));
+    std::string_view id(tool_id);
+    auto it = tooltips_.find(id);
     if (it != tooltips_.end())
         return it->second;
     return string();
@@ -232,7 +233,7 @@ string ToolManager::get_tooltip(const char* tool_id) const
 void ToolManager::set_tooltip(const char* tool_id, const string& tip)
 {
     if (tool_id)
-        tooltips_[string(tool_id)] = tip;
+        tooltips_[string(tool_id)] = tip; // Keep string allocation here for insertion
 }
 
 void ToolManager::on_frame(float dt)
