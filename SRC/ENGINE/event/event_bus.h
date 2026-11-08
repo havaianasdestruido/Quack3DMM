@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
+#include <map>
+#include <set>
+#include <string_view>
 #include <memory>
 #include <functional>
 #include <mutex>
@@ -88,7 +90,7 @@ public:
         return fire_cancellable_internal(T::StaticID(), &e);
     }
 
-    void fire_raw(EventID id, const AnyEvent *event);
+    void fire_raw(std::string_view id, const AnyEvent *event);
 
     bool cancel(EventID id);
 
@@ -118,17 +120,17 @@ public:
 
 private:
     void subscribe_internal(EventID id, std::unique_ptr<Handler> h, const std::string &mod_id, int priority);
-    Cancelled fire_cancellable_internal(EventID id, AnyEvent *event);
+    Cancelled fire_cancellable_internal(std::string_view id, AnyEvent *event);
 
-    void fire_internal(EventID id, AnyEvent *event);
+    void fire_internal(std::string_view id, AnyEvent *event);
 
     using HandlerEntry = std::pair<int, std::unique_ptr<Handler>>;
 
-    std::unordered_map<EventID, std::vector<HandlerEntry>> handlers_;
+    std::map<EventID, std::vector<HandlerEntry>, std::less<>> handlers_;
     std::unordered_map<void *, std::pair<EventID, std::string>> handler_owners_;
-    std::unordered_set<EventID> disabled_;
-    std::unordered_map<EventID, int> throttle_;
-    std::unordered_map<EventID, long> last_fire_;
+    std::set<EventID, std::less<>> disabled_;
+    std::map<EventID, int, std::less<>> throttle_;
+    std::map<EventID, long, std::less<>> last_fire_;
 
     bool recording_ = false;
     std::vector<std::pair<EventID, std::unique_ptr<AnyEvent>>> recorded_;

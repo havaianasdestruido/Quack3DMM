@@ -2,7 +2,8 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
+#include <string_view>
 #include <functional>
 
 namespace q3d {
@@ -14,27 +15,29 @@ class HookSystem {
 public:
     static HookSystem &instance();
 
+    // Performance optimization: Using transparent lookups to avoid allocating std::string on hook calls
     template<typename R, typename... Args>
     R call_hook(const char *name, R(*default_fn)(Args...), Args... args) {
         bool cancelled = false;
-        auto &before = get_before_hooks(name);
-        for (auto &entry : before) {
-            entry.second(name, &cancelled);
+        if (auto *before = get_before_hooks(name)) {
+            for (auto &entry : *before) {
+                entry.second(name, &cancelled);
+            }
         }
 
         R result{};
         if (!cancelled) {
-            auto &replace = get_replace_hooks(name);
-            if (!replace.empty()) {
-                result = replace.front()(name, args...);
+            if (auto *replace = get_replace_hooks(name); replace && !replace->empty()) {
+                result = replace->front()(name, args...);
             } else {
                 result = default_fn(args...);
             }
         }
 
-        auto &after = get_after_hooks(name);
-        for (auto &entry : after) {
-            entry.second(name, result, args...);
+        if (auto *after = get_after_hooks(name)) {
+            for (auto &entry : *after) {
+                entry.second(name, result, args...);
+            }
         }
 
         return result;
@@ -58,13 +61,13 @@ public:
 private:
     using HookEntry = std::pair<int, HookCallback>;
 
-    std::vector<HookEntry> &get_before_hooks(const char *name);
-    std::vector<HookEntry> &get_after_hooks(const char *name);
-    std::vector<HookCallback> &get_replace_hooks(const char *name);
+    const std::vector<HookEntry> *get_before_hooks(std::string_view name);
+    const std::vector<HookEntry> *get_after_hooks(std::string_view name);
+    const std::vector<HookCallback> *get_replace_hooks(std::string_view name);
 
-    std::unordered_map<std::string, std::vector<HookEntry>> before_hooks_;
-    std::unordered_map<std::string, std::vector<HookEntry>> after_hooks_;
-    std::unordered_map<std::string, std::vector<HookCallback>> replace_hooks_;
+    std::map<std::string, std::vector<HookEntry>, std::less<>> before_hooks_;
+    std::map<std::string, std::vector<HookEntry>, std::less<>> after_hooks_;
+    std::map<std::string, std::vector<HookCallback>, std::less<>> replace_hooks_;
     std::unordered_map<void *, std::string> hook_owners_;
 };
 

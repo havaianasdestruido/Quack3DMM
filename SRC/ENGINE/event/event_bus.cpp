@@ -22,7 +22,8 @@ void EventBus::subscribe_internal(EventID id, std::unique_ptr<Handler> h, const 
     }
 }
 
-void EventBus::fire_internal(EventID id, AnyEvent *event) {
+// Performance optimization: using std::string_view for zero-allocation lookup
+void EventBus::fire_internal(std::string_view id, AnyEvent *event) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (disabled_.count(id)) return;
 
@@ -39,7 +40,13 @@ void EventBus::fire_internal(EventID id, AnyEvent *event) {
 
         long diff = ms - last;
         if (diff < 1000 / std::max(1, itThrottle->second)) return;
-        last_fire_[id] = ms;
+
+        // Zero-allocation update if it exists, otherwise string construction is required only once
+        if (itLast != last_fire_.end()) {
+            itLast->second = ms;
+        } else {
+            last_fire_.emplace(std::string(id), ms);
+        }
     }
 
     auto it = handlers_.find(id);
@@ -49,11 +56,11 @@ void EventBus::fire_internal(EventID id, AnyEvent *event) {
     }
 
     if (recording_) {
-        recorded_.emplace_back(id, event->clone());
+        recorded_.emplace_back(std::string(id), event->clone());
     }
 }
 
-Cancelled EventBus::fire_cancellable_internal(EventID id, AnyEvent *event) {
+Cancelled EventBus::fire_cancellable_internal(std::string_view id, AnyEvent *event) {
     fire_internal(id, event);
     return false;
 }
@@ -79,7 +86,7 @@ EventBus::Subscription EventBus::on_pattern(const char *mod_id, const char *patt
     return { pattern, priority, raw };
 }
 
-void EventBus::fire_raw(EventID id, const AnyEvent *event) {
+void EventBus::fire_raw(std::string_view id, const AnyEvent *event) {
     fire_internal(id, const_cast<AnyEvent *>(event));
 }
 

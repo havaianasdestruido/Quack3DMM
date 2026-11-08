@@ -20,3 +20,6 @@
 ## 2024-10-31 - Zero-allocation map lookup with string_view
 **Learning:** `std::map` and `std::unordered_map` with `std::string` keys require constructing a `std::string` when calling `.find()` or `.erase()` with a `const char*` or `std::string_view` parameter unless a transparent comparator (`std::less<>`) is provided. This causes unnecessary heap allocations.
 **Action:** When using associative containers with string keys in C++14/17, explicitly define the comparator as `std::less<>` (e.g., `std::map<std::string, T, std::less<>>`) to enable zero-allocation lookups with `std::string_view` or `const char*`.
+## 2024-11-14 - Zero-allocation lookup in hot-path event map
+**Learning:** `std::unordered_map` does not support transparent lookups (like `find(string_view)`) until C++20. Changing `unordered_map` to `map` with `std::less<>` eliminates string allocations during lookup. Also, avoiding `operator[]` when a default constructed element isn't needed saves insertions of empty elements, keeping the map small and preventing unnecessary overhead.
+**Action:** When a map is queried frequently with string literals or `const char*` on hot paths, use `std::map<std::string, T, std::less<>>` and use `.find(std::string_view)` to prevent heap allocations. Never use `operator[]` for lookups if the item might not exist.
