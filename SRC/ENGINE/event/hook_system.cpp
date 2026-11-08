@@ -10,16 +10,19 @@ HookSystem &HookSystem::instance() {
     return hooks;
 }
 
-std::vector<HookSystem::HookEntry> &HookSystem::get_before_hooks(const char *name) {
-    return before_hooks_[name];
+const std::vector<HookSystem::HookEntry> *HookSystem::get_before_hooks(std::string_view name) {
+    auto it = before_hooks_.find(name);
+    return it != before_hooks_.end() ? &it->second : nullptr;
 }
 
-std::vector<HookSystem::HookEntry> &HookSystem::get_after_hooks(const char *name) {
-    return after_hooks_[name];
+const std::vector<HookSystem::HookEntry> *HookSystem::get_after_hooks(std::string_view name) {
+    auto it = after_hooks_.find(name);
+    return it != after_hooks_.end() ? &it->second : nullptr;
 }
 
-std::vector<HookCallback> &HookSystem::get_replace_hooks(const char *name) {
-    return replace_hooks_[name];
+const std::vector<HookCallback> *HookSystem::get_replace_hooks(std::string_view name) {
+    auto it = replace_hooks_.find(name);
+    return it != replace_hooks_.end() ? &it->second : nullptr;
 }
 
 void HookSystem::register_before_hook(const char *mod_id, const char *name, HookCallback cb, int priority) {
